@@ -6,6 +6,7 @@ use autodie;
 use Moose;
 use MooseX::Method::Signatures;
 use WWW::Mechanize;
+use Carp qw(croak);
 
 # ABSTRACT: WebScraping pseudo-API for iDoneThis
 
@@ -21,6 +22,7 @@ sub BUILD {
     my ($self, $args) = @_;
 
     my $agent = WWW::Mechanize->new;
+    $agent->agent_alias ( "Linux Mozilla" );
 
     $self->agent( $agent );
 
@@ -36,7 +38,11 @@ sub BUILD {
         }
     );
 
-    say STDERR $agent->content;
+    my $url = $agent->uri;
+
+    if ($url !~ m{/cal/$args->{user}/?$}) {
+        croak "Login to idonethis failed (unexpected URL $url)";
+    }
 
     return;
 
