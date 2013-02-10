@@ -6,7 +6,10 @@ use autodie;
 use Moose;
 use MooseX::Method::Signatures;
 use WWW::Mechanize;
+use JSON::Any;
 use Carp qw(croak);
+
+my $json = JSON::Any->new;
 
 # ABSTRACT: WebScraping pseudo-API for iDoneThis
 
@@ -51,7 +54,36 @@ sub BUILD {
 
 }
 
-# TODO: Use a proper ISO date type
+=method get_day
+
+    $idt->get_day("2012-01-01");
+
+Gets the data for a given day. An array will be returned which is a
+conversation from the JSON data structure used by idonethis. The
+structure at the time of writing looks like this:
+
+    [
+        {
+            owner => 'some_user',
+            avatar_url => '/site_media/blahblah/foo.png',
+            modified => '2012-01-01T15:22:33.12345',
+            calendar => {
+                short_name => 'some_short_name', # usually owner name
+                name => 'personal',
+                type => 'PERSONAL',
+            },
+            created => '2012-01-01T15:22:33.12345',
+            done_date => '2012-01-01',
+            text => 'Wrote code to frobinate the foobar',
+            nicest_name => 'some_user',
+            type => 'dailydone',
+            id => 12345
+        },
+        ...
+    ]
+
+=cut
+
 method get_day( Str $date) {
     my $url = $self->user_url . "dailydone?";
 
@@ -59,7 +91,7 @@ method get_day( Str $date) {
 
     $self->agent->get($url);
 
-    return $self->agent->content;
+    return $json->decode( $self->agent->content );
 }
 
 1;
