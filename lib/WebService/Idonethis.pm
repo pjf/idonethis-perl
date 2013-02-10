@@ -16,7 +16,8 @@ use Carp qw(croak);
 
 =cut
 
-has agent => ( is => 'rw' );
+has agent    => ( is => 'rw' );
+has user_url => ( is => 'rw' );
 
 sub BUILD {
     my ($self, $args) = @_;
@@ -44,8 +45,21 @@ sub BUILD {
         croak "Login to idonethis failed (unexpected URL $url)";
     }
 
+    $self->user_url( $url );
+
     return;
 
+}
+
+# TODO: Use a proper ISO date type
+method get_day( Str $date) {
+    my $url = $self->user_url . "dailydone?";
+
+    $url .= "start=$date&end=$date";
+
+    $self->agent->get($url);
+
+    return $self->agent->content;
 }
 
 1;
