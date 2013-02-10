@@ -26,4 +26,12 @@ my $idt = WebService::Idonethis->new(
 
 ok(1, "Login successful");
 
+if ($config->{auth}{user} eq "pjf") {
+    # Author tests. :)
+
+    my $dones = $idt->get_day("2013-02-05");
+
+    is($dones->[1]{text}, "Returned to Melbourne.", "Test specific done");
+}
+
 done_testing;
