@@ -32,6 +32,10 @@ my $json = JSON::Any->new;
         say "* $item->{text}";
     }
 
+    # Submit a new done item.
+
+    $idt->set_done(text => "Drank ALL the coffee!");
+
 =head1 DESCRIPTION
 
 This is an extremely bare-bones wrapper around the L<idonethis.com>
@@ -46,6 +50,9 @@ was doing a year ago by email.
 The L<idonethis-memories> command included in this distribution is
 a simple proof-of-concept that reimplements this service, and is suitable
 for running as a cron job.
+
+The L<idone> command included with this distribution allows you to submit
+new done items from the command line.
 
 Patches are extremely welcome. L<https://github.com/pfenwick/idonethis-perl>
 
