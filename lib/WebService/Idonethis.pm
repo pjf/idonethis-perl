@@ -197,4 +197,10 @@ method set_done(
     return;
 }
 
+=head1 SEE ALSO
+
+L<http://privacygeek.blogspot.com.au/2013/02/reimplementing-idonethis-memory-service.html>
+
+=cut
+
 1;
