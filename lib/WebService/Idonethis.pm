@@ -8,6 +8,8 @@ use MooseX::Method::Signatures;
 use WWW::Mechanize;
 use JSON::Any;
 use Carp qw(croak);
+use POSIX qw(strftime);
+use HTTP::Request;
 
 my $json = JSON::Any->new;
 
@@ -51,8 +53,9 @@ Patches are extremely welcome. L<https://github.com/pfenwick/idonethis-perl>
 
 =cut
 
-has agent    => ( is => 'rw' );
-has user_url => ( is => 'rw' );
+has agent    => (               is => 'rw' );
+has user_url => (               is => 'rw' );
+has user     => ( isa => 'Str', is => 'rw' );
 
 sub BUILD {
     my ($self, $args) = @_;
@@ -81,6 +84,7 @@ sub BUILD {
     }
 
     $self->user_url( $url );
+    $self->user( $args->{user} );
 
     return;
 
@@ -124,6 +128,66 @@ method get_day( Str $date) {
     $self->agent->get($url);
 
     return $json->decode( $self->agent->content );
+}
+
+=method set_done
+
+    $idt->set_done( text => "Installed WebService::Idonethis" );
+    $idt->set_done( date => '2013-01-01', text => "Drank coffee." );
+
+Submits a done item to I<idonethis.com>.  The C<date> field is optional,
+but the C<text> field is mandatory.  The current date (localtime) will
+be used if no date is specified.
+
+Returns nothing on success. Throws an exception on failure.
+
+=cut
+
+method set_done(
+    Str :$date  ,
+    Str :$text !
+) {
+
+    # TODO: Use real date objects.
+    # TODO: Allow more arguments to be passed.
+
+    my $now       = time();
+    my $timestamp = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime($now));
+
+    $date ||= strftime("%Y-%m-%d", localtime($now));
+
+    my $done_json = $json->encode({
+        calendar       => $self->user,
+        owner          => $self->user,
+        created        => $timestamp,
+        modified       => $timestamp,
+        done_date      => $date,
+        text           => $text,
+        total_comments => undef,
+        total_likes    => undef,
+        url            => undef,
+    });
+
+    # TODO: There's got to be a better way of doing JSON posts than this...
+
+    my $req = HTTP::Request->new( 'POST', $self->user_url . "dailydone?" );
+    $req->header ( 'Content-Type' => 'application/json' );
+    $req->header ( 'Accept' => 'application/json, text/javascript, */*; q0.01' );
+    $req->content( $done_json );
+
+    # XXX: This is wrong, and you should never do it, but it looks like
+    # we have to send this has a header for idonethis to accept the request.
+
+    $req->header (
+        'X-CSRFToken' =>
+            $self->agent->cookie_jar->{COOKIES}{'idonethis.com'}{'/'}{csrftoken}[1]
+    );
+
+    my $response = $self->agent->request( $req );
+
+    # TODO: Check we die automatically on failed submission.
+
+    return;
 }
 
 1;
