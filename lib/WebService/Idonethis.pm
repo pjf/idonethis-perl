@@ -32,6 +32,10 @@ my $json = JSON::Any->new;
         say "* $item->{text}";
     }
 
+    # Get items done today
+
+    my $dones = $idt->get_today;
+
     # Submit a new done item.
 
     $idt->set_done(text => "Drank ALL the coffee!");
@@ -99,7 +103,7 @@ sub BUILD {
 
 =method get_day
 
-    $idt->get_day("2012-01-01");
+    my $dones = $idt->get_day("2012-01-01");
 
 Gets the data for a given day. An array will be returned which is a
 conversation from the JSON data structure used by idonethis. The
@@ -135,6 +139,21 @@ method get_day( Str $date) {
     $self->agent->get($url);
 
     return $json->decode( $self->agent->content );
+}
+
+=method get_today
+
+    my $dones = $idt->get_today;
+
+This is a convenience method that calls L<get_day> using the current
+(localtime) date as an argument.
+
+=cut
+
+method get_today() {
+    my $today = strftime("%Y-%m-%d",localtime);
+
+    return $self->get_day( $today );
 }
 
 =method set_done
