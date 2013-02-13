@@ -71,10 +71,19 @@ has user     => ( isa => 'Str', is => 'rw' );
 sub BUILD {
     my ($self, $args) = @_;
 
-    my $agent = WWW::Mechanize->new;
-    $agent->agent_alias ( "Linux Mozilla" );
+    my $agent = $self->agent;
 
-    $self->agent( $agent );
+    if (not $agent) {
+
+        # Initialise user-agent if none provided.
+
+        $agent = WWW::Mechanize->new(
+            agent => "perl/$], WebService::Idonethis/" . $self->VERSION
+        );
+
+        $self->agent( $agent );
+
+    }
 
     # Log in!
 
