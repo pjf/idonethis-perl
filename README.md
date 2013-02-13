@@ -1,4 +1,4 @@
-# WebService::IDonethis - Perl wrapper around idonethis.com
+# WebService::Idonethis - Perl wrapper around idonethis.com
 
 ## Using this module
 
