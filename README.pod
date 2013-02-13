@@ -1,6 +1,0 @@
-This implements a simple Perl front-end for the L<http://idonethis.com/> website.
-
-See L<http://privacygeek.blogspot.com.au/2013/02/reimplementing-idonethis-memory-service.html>
-for an article on what this does and how to install it.
-
-This code can be found released on the CPAN as C<WebService::Idonethis>
