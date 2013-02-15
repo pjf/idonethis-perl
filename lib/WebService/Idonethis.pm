@@ -3,7 +3,7 @@ use v5.010;
 use strict;
 use warnings;
 use autodie;
-use Moose;
+use Moo;
 use WWW::Mechanize;
 use JSON::Any;
 use Carp qw(croak);
@@ -74,7 +74,7 @@ Sessions are cached in your XDG cache directory as
 
 has agent    => (               is => 'rw' );
 has user_url => (               is => 'rw' );
-has user     => ( isa => 'Str', is => 'rw' );
+has user     => (               is => 'rw' );
 has xdg      => (               is => 'rw' );
 
 sub BUILD {
@@ -149,6 +149,11 @@ sub BUILD {
 
         $self->user_url( $url );
         $self->user( $args->{user} );
+
+        # We used to save the cookie jar on destruction, but that
+        # caused a hiccup with Moo. Now we save immediately after
+        # login.
+        $self->agent->cookie_jar->save();
     };
 
     return;
@@ -272,10 +277,6 @@ sub set_done {
     # TODO: Check we die automatically on failed submission.
 
     return;
-}
-
-sub DEMOLISH {
-    $_[0]->agent->cookie_jar->save;
 }
 
 __PACKAGE__->meta->make_immutable;
