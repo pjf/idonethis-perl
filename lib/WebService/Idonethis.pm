@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use autodie;
 use Moose;
-use MooseX::Method::Signatures;
 use WWW::Mechanize;
 use JSON::Any;
 use Carp qw(croak);
@@ -186,7 +185,10 @@ structure at the time of writing looks like this:
 
 =cut
 
-method get_day( Str $date) {
+sub get_day {
+
+    my ($self, $date) = @_;
+
     my $url = $self->user_url . "dailydone?";
 
     $url .= "start=$date&end=$date";
@@ -205,7 +207,8 @@ This is a convenience method that calls L<get_day> using the current
 
 =cut
 
-method get_today() {
+sub get_today {
+    my ($self) = @_;
     my $today = strftime("%Y-%m-%d",localtime);
 
     return $self->get_day( $today );
@@ -224,10 +227,9 @@ Returns nothing on success. Throws an exception on failure.
 
 =cut
 
-method set_done(
-    Str :$date  ,
-    Str :$text !
-) {
+sub set_done {
+
+    my ($self, %args)  = @_;
 
     # TODO: Use real date objects.
     # TODO: Allow more arguments to be passed.
@@ -235,7 +237,8 @@ method set_done(
     my $now       = time();
     my $timestamp = strftime("%Y-%m-%dT%H:%M:%SZ", gmtime($now));
 
-    $date ||= strftime("%Y-%m-%d", localtime($now));
+    my $date = $args{date} || strftime("%Y-%m-%d", localtime($now));
+    my $text = $args{text} or croak "set_done requires a 'text' argument";
 
     my $done_json = $json->encode({
         calendar       => $self->user,
@@ -274,6 +277,8 @@ method set_done(
 sub DEMOLISH {
     $_[0]->agent->cookie_jar->save;
 }
+
+__PACKAGE__->meta->make_immutable;
 
 =head1 SEE ALSO
 
