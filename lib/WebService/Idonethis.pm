@@ -64,6 +64,11 @@ new done items from the command line.
 
 Patches are extremely welcome. L<https://github.com/pfenwick/idonethis-perl>
 
+=head1 FILES
+
+Sessions are cached in your XDG cache directory as
+'webservice-idonethis-perl'.
+
 =for Pod::Coverage BUILD
 
 =cut
