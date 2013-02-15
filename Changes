@@ -1,0 +1,6 @@
+{{$NEXT}}
+
+* Removed dependencies on MooseX::Method::Signatures. Installing should be
+  much easier now.
+* Main class is now immutable. Execution should be faster now.
+* Shifted from Moose to Moo, which is much faster and has fewer dependencies.
