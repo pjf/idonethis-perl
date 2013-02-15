@@ -69,7 +69,7 @@ Patches are extremely welcome. L<https://github.com/pfenwick/idonethis-perl>
 Sessions are cached in your XDG cache directory as
 'webservice-idonethis-perl'.
 
-=for Pod::Coverage BUILD
+=for Pod::Coverage BUILD DEMOLISH
 
 =cut
 
