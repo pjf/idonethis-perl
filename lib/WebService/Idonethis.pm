@@ -10,6 +10,10 @@ use JSON::Any;
 use Carp qw(croak);
 use POSIX qw(strftime);
 use HTTP::Request;
+use File::XDG;
+use File::Spec;
+use HTTP::Cookies;
+use Try::Tiny;
 
 my $json = JSON::Any->new;
 
@@ -67,44 +71,81 @@ Patches are extremely welcome. L<https://github.com/pfenwick/idonethis-perl>
 has agent    => (               is => 'rw' );
 has user_url => (               is => 'rw' );
 has user     => ( isa => 'Str', is => 'rw' );
+has xdg      => (               is => 'rw' );
 
 sub BUILD {
     my ($self, $args) = @_;
 
     my $agent = $self->agent;
 
+    if (not $self->xdg) { 
+
+        # XDG is used to figure out where to store cache and config
+        # files. If not provided at initialisation time, we'll
+        # mae our own.
+
+        $self->xdg(File::XDG->new(name => 'webservice-idonethis-perl'));
+    }
+
+    # Theoretically these may get changed after login.
+    $self->user    ( $args->{user} );
+    $self->user_url( "https://idonethis.com/cal/$args->{user}/" );
+
     if (not $agent) {
 
-        # Initialise user-agent if none provided.
+        # Initialise user-agent if none provided, storing cookies in
+        # the xdg cache.
+
+        my $xdg = $self->xdg;
+
+        if (not -e $xdg->cache_home) {
+            mkdir($xdg->cache_home);
+        }
+
+        my $user_cache = File::Spec->catfile( $xdg->cache_home, $self->user );
+
+        if (not -e $user_cache) {
+            mkdir($user_cache);
+        }
 
         $agent = WWW::Mechanize->new(
-            agent => "perl/$], WebService::Idonethis/" . $self->VERSION
+            agent      => "perl/$], WebService::Idonethis/" . $self->VERSION,
+            cookie_jar => HTTP::Cookies->new( file => File::Spec->catfile( $user_cache , "cookies") ),
         );
 
         $self->agent( $agent );
 
     }
 
-    # Log in!
+    # Ping idonethis to see if we even need to login.
 
-    $agent->get( "https://idonethis.com/accounts/login/" );
+    # We're going to guess our user URL so we can do a get_day.
 
-    $agent->submit_form(
-        form_id => 'register',
-        fields => {
-            username => $args->{user},
-            password => $args->{pass},
-        }
-    );
-
-    my $url = $agent->uri;
-
-    if ($url !~ m{/cal/$args->{user}/?$}) {
-        croak "Login to idonethis failed (unexpected URL $url)";
+    try {
+        $self->get_today;   # Throws on failure
     }
+    catch {
+        # Our ping failed, so login instead.
 
-    $self->user_url( $url );
-    $self->user( $args->{user} );
+        $agent->get( "https://idonethis.com/accounts/login/" );
+
+        $agent->submit_form(
+            form_id => 'register',
+            fields => {
+                username => $args->{user},
+                password => $args->{pass},
+            }
+        );
+
+        my $url = $agent->uri;
+
+        if ($url !~ m{/cal/$args->{user}/?$}) {
+            croak "Login to idonethis failed (unexpected URL $url)";
+        }
+
+        $self->user_url( $url );
+        $self->user( $args->{user} );
+    };
 
     return;
 
@@ -223,6 +264,10 @@ method set_done(
     # TODO: Check we die automatically on failed submission.
 
     return;
+}
+
+sub DEMOLISH {
+    $_[0]->agent->cookie_jar->save;
 }
 
 =head1 SEE ALSO
