@@ -70,7 +70,7 @@ Sessions are cached in your XDG cache directory as
 
 =for Pod::Coverage BUILD DEMOLISH
 
-=for agent user_url user xdg
+=for Pod::Coverage agent user_url user xdg
 
 =cut
 
