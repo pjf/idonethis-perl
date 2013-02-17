@@ -34,6 +34,9 @@ local timezone on your machine).
 The C<-l> switch can be used to show what you've done today (in which
 case all remaining arguments are ignored).
 
+The C<-y> switch allows operations (listing and adding) to yesteday's
+done list, rather than today's (the default).
+
 Patches are extremely welcome.  L<https://github.com/pfenwick/idonethis-perl>
 
 =cut
@@ -41,15 +44,17 @@ Patches are extremely welcome.  L<https://github.com/pfenwick/idonethis-perl>
 use WebService::Idonethis;
 use Config::Tiny;
 use POSIX qw(tzset strftime);
+use constant ONE_DAY => 86400;      # Seconds in a day
 
 my %opts = (
     'l' => undef,       # List
+    'y' => undef,       # yesterday
 );
 
-getopts('l', \%opts);
+getopts('ly', \%opts);
 
 unless ($opts{l} or @ARGV) {
-    die "Usage: $0 [-l] [done item description]\n";
+    die "Usage: $0 [-l] [-y] [done item description]\n";
 }
 
 my $config = Config::Tiny->read( "$ENV{HOME}/.idonethisrc" );
@@ -63,13 +68,17 @@ my $idt = WebService::Idonethis->new(
     pass => $config->{auth}{pass},
 );
 
+my $time = $opts{y} ? time() - ONE_DAY : time();
+
+my $date = strftime("%Y-%m-%d", localtime($time));
+
 if ($opts{l}) {
-    my $dones = $idt->get_today();
+    my $dones = $idt->get_day($date);
 
     foreach my $item (@$dones) {
         say "* $item->{text}";
     }
 }
 else {
-    $idt->set_done( text => "@ARGV" );
+    $idt->set_done( text => "@ARGV", date => $date );
 }
