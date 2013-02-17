@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+0.06      2013-02-15 13:56:08 Australia/Melbourne
+
 * Removed dependencies on MooseX::Method::Signatures. Installing should be
   much easier now.
 * Main class is now immutable. Execution should be faster now.
