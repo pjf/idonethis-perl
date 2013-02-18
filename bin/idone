@@ -18,6 +18,9 @@ use Getopt::Std;
 
     # See what I've done today.
     $ idone -l
+    
+    # See what I've done today, and read new items from STDIN.
+    idone -lc
 
     # In ~/.idonethisrc
     [auth]
@@ -37,6 +40,9 @@ case all remaining arguments are ignored).
 The C<-y> switch allows operations (listing and adding) to yesteday's
 done list, rather than today's (the default).
 
+Without the C<-l> swich, or with the C<-c> switch, will read done items from
+STDIN (one per line).
+
 Patches are extremely welcome.  L<https://github.com/pfenwick/idonethis-perl>
 
 =cut
@@ -47,15 +53,12 @@ use POSIX qw(tzset strftime);
 use constant ONE_DAY => 86400;      # Seconds in a day
 
 my %opts = (
+    'c' => undef,       # STDIN
     'l' => undef,       # List
     'y' => undef,       # yesterday
 );
 
-getopts('ly', \%opts);
-
-unless ($opts{l} or @ARGV) {
-    die "Usage: $0 [-l] [-y] [done item description]\n";
-}
+getopts('cly', \%opts);
 
 my $config = Config::Tiny->read( "$ENV{HOME}/.idonethisrc" );
 
@@ -72,13 +75,27 @@ my $time = $opts{y} ? time() - ONE_DAY : time();
 
 my $date = strftime("%Y-%m-%d", localtime($time));
 
+# List items, if required.
+
 if ($opts{l}) {
     my $dones = $idt->get_day($date);
+
+    say "\nDone tasks for $date:\n";
 
     foreach my $item (@$dones) {
         say "* $item->{text}";
     }
 }
-else {
-    $idt->set_done( text => "@ARGV", date => $date );
+
+if ($opts{c} or not $opts{l}) {
+    if (@ARGV) {
+        $idt->set_done( text => "@ARGV", date => $date );
+    }
+    else {
+        say "\nReading done items for $date (one per line).\n";
+        while (<STDIN>) {
+            chomp;
+            $idt->set_done( text => $_, date => $date );
+        }
+    }
 }

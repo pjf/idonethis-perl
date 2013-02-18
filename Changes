@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+* Added '-c' switch to idone.
+* Idone now always lists the date it's reading from, or adding to.
+* Try `idone -lc` for the best todo cmdline ever.
+
 0.07      2013-02-18 10:57:51 Australia/Melbourne
 
 * The `idone` program now accepts a '-y' switch to allow listing or adding
