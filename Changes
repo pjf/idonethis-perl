@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+* Github #5 - Actually give help on --help. Thanks @wizonesolutions.
+
 0.09      2013-02-19 00:38:22 Australia/Melbourne
 
 * Added '-f' switch to `idone` and `idonethis-memories` to specify

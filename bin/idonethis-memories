@@ -3,7 +3,6 @@ use 5.010;
 use strict;
 use warnings;
 use autodie;
-use Getopt::Std;
 
 # ABSTRACT: Send reminders of what you were doing a while ago.
 
@@ -34,6 +33,8 @@ Patches are extremely welcome.  L<https://github.com/pfenwick/idonethis-perl>
 
 =cut
 
+use Getopt::Std;
+use Pod::Usage;
 use WebService::Idonethis;
 use Config::Tiny;
 use POSIX qw(tzset strftime);
@@ -42,6 +43,9 @@ use constant ONE_WEEK   => 7   * 86400;
 use constant ONE_MONTH  => 30  * 86400;     # It's about a month...
 use constant SIX_MONTHS => 365 * 86400 / 2; # About six months...
 use constant ONE_YEAR   => 365 * 86400;     # TODO: Leapyears
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+sub HELP_MESSAGE { pod2usage(1); }
 
 my %opts = (
     'f' => "$ENV{HOME}/.idonethisrc",

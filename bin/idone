@@ -3,8 +3,6 @@ use 5.010;
 use strict;
 use warnings;
 use autodie;
-use Getopt::Std;
-use Pod::Usage;
 
 # ABSTRACT: Command line interface to idonethis.com
 
@@ -84,10 +82,15 @@ This switch overrides the C<-d> switch, if given.
 
 =cut
 
+use Getopt::Std;
+use Pod::Usage;
 use WebService::Idonethis;
 use Config::Tiny;
 use POSIX qw(tzset strftime);
 use constant ONE_DAY => 86400;      # Seconds in a day
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+sub VERSION_MESSAGE { pod2usage(1); }
 
 my %opts = (
     'c' => undef,                            # STDIN
