@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+0.08      2013-02-18 13:52:43 Australia/Melbourne
+
 * Added '-c' switch to idone.
 * Idone now always lists the date it's reading from, or adding to.
 * Try `idone -lc` for the best todo cmdline ever.
