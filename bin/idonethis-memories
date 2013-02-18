@@ -3,6 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 use autodie;
+use Getopt::Std;
 
 # ABSTRACT: Send reminders of what you were doing a while ago.
 
@@ -26,6 +27,9 @@ This is a simple proof-of-concept for iDoneThis's excellent (but
 now defunct) memory service, which would send reminders as to what
 one was doing a year ago by email.
 
+The C<-f> switch can be used to specify a location for the configuration
+file (by default F<~/.idonethisrc>).
+
 Patches are extremely welcome.  L<https://github.com/pfenwick/idonethis-perl>
 
 =cut
@@ -39,13 +43,19 @@ use constant ONE_MONTH  => 30  * 86400;     # It's about a month...
 use constant SIX_MONTHS => 365 * 86400 / 2; # About six months...
 use constant ONE_YEAR   => 365 * 86400;     # TODO: Leapyears
 
+my %opts = (
+    'f' => "$ENV{HOME}/.idonethisrc",
+);
+
+getopts('f:', \%opts);
+
 $ENV{TZ} = "Australia/Melbourne";      # I'm usually here.
 tzset();
 
-my $config = Config::Tiny->read( "$ENV{HOME}/.idonethisrc" );
+my $config = Config::Tiny->read( $opts{f} );
 
 unless ($config->{auth}{user}) {
-    die "Cannot find credentials in $ENV{HOME}/.idonethisrc";
+    die "Cannot find credentials in $opts{f}\n";
 }
 
 my $idt = WebService::Idonethis->new(

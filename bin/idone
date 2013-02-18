@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use autodie;
 use Getopt::Std;
+use Pod::Usage;
 
 # ABSTRACT: Command line interface to idonethis.com
 
@@ -18,9 +19,18 @@ use Getopt::Std;
 
     # See what I've done today.
     $ idone -l
+
+    # See what I've done yesterday.
+    $ idone -ly
+
+    # See what I did some time ago.
+    $ idone -ld 2012-01-01
     
     # See what I've done today, and read new items from STDIN.
     idone -lc
+
+    # See what I've done yesterday, and add more items from STDIN.
+    idone -lcy
 
     # In ~/.idonethisrc
     [auth]
@@ -34,16 +44,43 @@ arguments are concatenated together to form a single string, which
 is then submitted to your calendar for the current day (using the
 local timezone on your machine).
 
-The C<-l> switch can be used to show what you've done today (in which
-case all remaining arguments are ignored).
-
-The C<-y> switch allows operations (listing and adding) to yesteday's
-done list, rather than today's (the default).
-
-Without the C<-l> swich, or with the C<-c> switch, will read done items from
-STDIN (one per line).
-
 Patches are extremely welcome.  L<https://github.com/pfenwick/idonethis-perl>
+
+=head1 OPTIONS
+
+=over
+
+=item B<-c>
+
+Read items from STDIN and add them to your done list, with one item per
+line. This is the default behaviour if C<-l> is not specified, nor any
+done item on the command line.
+
+=item B<-d date>
+
+Specify the date upon which actions should be taken, in YYYY-MM-DD format.
+Defaults to today. This switch is silently ignored if used with C<-y>.
+
+=item B<-f config>
+
+Specify the location of the configuration file.  Defaults to ~/.idonethisrc
+
+=item B<-h>
+
+Displays this help.
+
+=item B<-l>
+
+List items that you've done.  Combine this with the C<-c> switch
+to list done items, and let you add new ones to the end.
+
+=item B<-y>
+
+Perform all operations (adding and listing) using yesterday's date.
+This switch overrides the C<-d> switch, if given.
+
+
+=back
 
 =cut
 
@@ -53,17 +90,24 @@ use POSIX qw(tzset strftime);
 use constant ONE_DAY => 86400;      # Seconds in a day
 
 my %opts = (
-    'c' => undef,       # STDIN
-    'l' => undef,       # List
-    'y' => undef,       # yesterday
+    'c' => undef,                            # STDIN
+    'd' => strftime("%Y-%m-%d",localtime()), # Date
+    'f' => "$ENV{HOME}/.idonethisrc",        # Config
+    'h' => undef,                            # Help
+    'l' => undef,                            # List
+    'y' => undef,                            # Yesterday
 );
 
-getopts('cly', \%opts);
+getopts('cd:f:hly', \%opts);
 
-my $config = Config::Tiny->read( "$ENV{HOME}/.idonethisrc" );
+if ($opts{h}) {
+    pod2usage(1);
+}
+
+my $config = Config::Tiny->read( $opts{f} );
 
 unless ($config->{auth}{user}) {
-    die "Cannot find credentials in $ENV{HOME}/.idonethisrc";
+    die "Cannot find credentials in $opts{f}\n";
 }
 
 my $idt = WebService::Idonethis->new(
@@ -71,9 +115,12 @@ my $idt = WebService::Idonethis->new(
     pass => $config->{auth}{pass},
 );
 
-my $time = $opts{y} ? time() - ONE_DAY : time();
+my $date = $opts{d};
 
-my $date = strftime("%Y-%m-%d", localtime($time));
+# Handle yesterday if '-y' switch is turned on.
+if ($opts{y}) {
+    $date = strftime("%Y-%m-%d", localtime(time() - ONE_DAY));
+}
 
 # List items, if required.
 

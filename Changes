@@ -1,5 +1,14 @@
 {{$NEXT}}
 
+* Added '-f' switch to `idone` and `idonethis-memories` to specify
+  config file.
+
+* Added `-d` switch to `idone` to allow specification of dates.
+
+* Added `-h` switch to `idone` to show help.
+
+* Lots of new documentation in `idone`.
+
 0.08      2013-02-18 13:52:43 Australia/Melbourne
 
 * Added '-c' switch to idone.
