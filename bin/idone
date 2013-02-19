@@ -88,7 +88,9 @@ use WebService::Idonethis;
 use Config::Tiny;
 use POSIX qw(tzset strftime);
 use constant ONE_DAY => 86400;      # Seconds in a day
+binmode STDOUT,':utf8';             # Printing unicode is fine, Perl.
 
+# Make Getopt less wrong.
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
 sub VERSION_MESSAGE { pod2usage(1); }
 

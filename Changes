@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+* Remove spurious warnings when printing unicode/utf8.
+
 0.10      2013-02-19 02:20:24 Australia/Melbourne
 
 * Github #5 - Actually give help on --help. Thanks @wizonesolutions.
