@@ -3,6 +3,7 @@ Revision history for WebService::Idonethis
 {{$NEXT}}
 
     * INTERNAL: Made the changelog file look nicer.
+    * BUGFIX:   Decode HTML entities in done lists.
 
 0.11      2013-02-21 01:40:45 Australia/Melbourne
 

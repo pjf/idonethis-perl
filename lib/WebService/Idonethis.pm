@@ -12,6 +12,7 @@ use HTTP::Request;
 use File::XDG;
 use File::Spec;
 use HTTP::Cookies;
+use HTML::Entities qw(decode_entities);
 use Try::Tiny;
 
 my $json = JSON::Any->new;
@@ -170,6 +171,9 @@ Gets the data for a given day. An array will be returned which is a
 conversation from the JSON data structure used by idonethis. The
 structure at the time of writing looks like this:
 
+The 'text' field (and currently only the 'text' field) will have
+HTML entities converted before it is returned. (eg, '&gt' -> '>')
+
     [
         {
             owner => 'some_user',
@@ -202,7 +206,17 @@ sub get_day {
 
     $self->agent->get($url);
 
-    return $json->decode( $self->agent->content );
+    # Decode JSON
+
+    my $data = $json->decode( $self->agent->content );
+
+    # Decode HTML entities.
+
+    foreach my $record (@$data) {
+        $record->{text} = decode_entities($record->{text}) if $record->{text};
+    }
+
+    return $data;
 }
 
 =method get_today
