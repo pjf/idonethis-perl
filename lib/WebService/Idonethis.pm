@@ -297,6 +297,15 @@ sub set_done {
 
 __PACKAGE__->meta->make_immutable;
 
+=head1 BUGS
+
+If a suitable cache location cannot be created on the filesystem, this class dies with
+an error. See L<https://github.com/pfenwick/idonethis-perl/issues/7> for more details.
+
+Other bugs may be present that are not listed in this documentation. See
+L<https://github.com/pfenwick/idonethis-perl/issues> for a full list, or to submit your
+own.
+
 =head1 SEE ALSO
 
 L<http://privacygeek.blogspot.com.au/2013/02/reimplementing-idonethis-memory-service.html>
