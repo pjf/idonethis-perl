@@ -2,6 +2,9 @@ Revision history for WebService::Idonethis
 
 {{$NEXT}}
 
+    * BUGFIX:   `idone` now supports unicode input (cmdline and STDIN).
+    * DEPENDS:   Added dependency on `utf8::all`.
+
 0.12      2013-02-27 15:41:24 Australia/Melbourne
 
     * INTERNAL: Made the changelog file look nicer.
