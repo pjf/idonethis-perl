@@ -3,6 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 use autodie;
+use utf8::all;
 
 # ABSTRACT: Command line interface to idonethis.com
 
@@ -88,7 +89,6 @@ use WebService::Idonethis;
 use Config::Tiny;
 use POSIX qw(tzset strftime);
 use constant ONE_DAY => 86400;      # Seconds in a day
-binmode STDOUT,':encoding(UTF-8)';  # Printing unicode is fine, Perl.
 
 # Make Getopt less wrong.
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
