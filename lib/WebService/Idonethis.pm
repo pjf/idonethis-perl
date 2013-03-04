@@ -280,8 +280,8 @@ sub set_done {
     $req->header ( 'Accept' => 'application/json, text/javascript, */*; q0.01' );
     $req->content( $done_json );
 
-    # XXX: This is wrong, and you should never do it, but it looks like
-    # we have to send this has a header for idonethis to accept the request.
+    # NOTE: This is wrong, and you should never do it, but it looks like
+    # we have to send this header for idonethis to accept the request.
 
     $req->header (
         'X-CSRFToken' =>
