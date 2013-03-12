@@ -57,7 +57,12 @@ done item on the command line.
 
 =item B<-d date>
 
-Specify the date upon which actions should be taken, in YYYY-MM-DD format.
+Specify the date upon which actions should be taken. Any date that can
+be understood by L<Date::Manip::Date> can be used, including strings such
+as 'last Tuesday' or 'three days ago'.
+
+If in doubt, use YYYY-MM-DD format.
+
 Defaults to today. This switch is silently ignored if used with C<-y>.
 
 =item B<-f config>
@@ -88,6 +93,7 @@ use Pod::Usage;
 use WebService::Idonethis;
 use Config::Tiny;
 use POSIX qw(tzset strftime);
+use Date::Manip::Date;
 use constant ONE_DAY => 86400;      # Seconds in a day
 
 # Make Getopt less wrong.
@@ -121,6 +127,16 @@ my $idt = WebService::Idonethis->new(
 );
 
 my $date = $opts{d};
+
+# If our date looks screwy, then try to parse it with Date::Manip
+
+if ($date !~ /^\d{4}-\d{2}-\d{2}$/) {
+    my $dmd = Date::Manip::Date->new;
+    if ($dmd->parse($date)) {
+        die "Can't parse date '$date' - " . $dmd->err . "\n";
+    }
+    $date = $dmd->printf("%Y-%m-%d");
+}
 
 # Handle yesterday if '-y' switch is turned on.
 if ($opts{y}) {

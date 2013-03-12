@@ -2,6 +2,10 @@ Revision history for WebService::Idonethis
 
 {{$NEXT}}
 
+    * FEATURE:  The '-d' switch now supports natural language date
+                inputs ('last thursday', '3 days ago', 'tuesday week', etc)
+                as well as YYYY-MM-DD format. (GH #9)
+
 0.14      2013-03-12 13:23:25 Australia/Melbourne
 
     * BUGFIX:   Usernames are no longer considered case-sensitive when
