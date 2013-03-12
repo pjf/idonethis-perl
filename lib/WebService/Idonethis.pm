@@ -146,7 +146,7 @@ sub BUILD {
 
         my $url = $agent->uri;
 
-        if ($url !~ m{/cal/$args->{user}/?$}) {
+        if ($url !~ m{/cal/$args->{user}/?$}i) {
             croak "Login to idonethis failed (unexpected URL $url)";
         }
 
