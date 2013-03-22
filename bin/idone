@@ -29,10 +29,10 @@ use utf8::all;
     $ idone -ld 2012-01-01
     
     # See what I've done today, and read new items from STDIN.
-    idone -lc
+    $ idone -lc
 
     # See what I've done yesterday, and add more items from STDIN.
-    idone -lcy
+    $ idone -lcy
 
     # In ~/.idonethisrc
     [auth]
