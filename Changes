@@ -3,6 +3,7 @@ Revision history for WebService::Idonethis
 {{$NEXT}}
 
     * DOCS:     Links to github.com/pfenwick updated to github.com/pjf
+    * FEATURE:  WebService::Idonethis now has a get_range() method.
 
 0.16      2013-03-22 14:16:56 Australia/Melbourne
 

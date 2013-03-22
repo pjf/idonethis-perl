@@ -197,26 +197,9 @@ HTML entities converted before it is returned. (eg, '&gt' -> '>')
 =cut
 
 sub get_day {
-
     my ($self, $date) = @_;
 
-    my $url = $self->user_url . "dailydone?";
-
-    $url .= "start=$date&end=$date";
-
-    $self->agent->get($url);
-
-    # Decode JSON
-
-    my $data = $json->decode( $self->agent->content );
-
-    # Decode HTML entities.
-
-    foreach my $record (@$data) {
-        $record->{text} = decode_entities($record->{text}) if $record->{text};
-    }
-
-    return $data;
+    return $self->get_range($date, $date);
 }
 
 =method get_today
@@ -233,6 +216,38 @@ sub get_today {
     my $today = strftime("%Y-%m-%d",localtime);
 
     return $self->get_day( $today );
+}
+
+=method get_range
+
+    my $done = $idt->get_range('2012-01-01', 2012-01-31');
+
+Gets everything done in a range of dates. Returns in the same
+format at L</get_day> above.
+
+=cut
+
+sub get_range {
+
+    my ($self, $start, $end) = @_;
+
+    my $url = $self->user_url . "dailydone?";
+
+    $url .= "start=$start&end=$end";
+
+    $self->agent->get($url);
+
+    # Decode JSON
+
+    my $data = $json->decode( $self->agent->content );
+
+    # Decode HTML entities.
+
+    foreach my $record (@$data) {
+        $record->{text} = decode_entities($record->{text}) if $record->{text};
+    }
+
+    return $data;
 }
 
 =method set_done
