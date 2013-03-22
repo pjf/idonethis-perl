@@ -4,6 +4,7 @@ Revision history for WebService::Idonethis
 
     * DOCS:     Links to github.com/pfenwick updated to github.com/pjf
     * FEATURE:  WebService::Idonethis now has a get_range() method.
+    * FEATURE:  `idone -r` now allows listing from a range of dates.
 
 0.16      2013-03-22 14:16:56 Australia/Melbourne
 

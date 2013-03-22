@@ -34,6 +34,9 @@ use utf8::all;
     # See what I've done yesterday, and add more items from STDIN.
     $ idone -lcy
 
+    # See what I've done in the last week
+    $ idone -lr 'last week,today'
+
     # In ~/.idonethisrc
     [auth]
     user=someuser
@@ -81,6 +84,14 @@ Displays this help.
 List items that you've done.  Combine this with the C<-c> switch
 to list done items, and let you add new ones to the end.
 
+=item B<-r>
+
+List items in a I<range> of dates, in the form C<-r '2013-01-01, 2013-01-31'>.
+Natural dates may also be used, as in C<-r '1 week ago, today'>.  This switch
+is exclusive of the C<-d>, C<-y> and C<-c> switches.
+
+This switch implies C<-l>.
+
 =item B<-V>
 
 Shows the current version and exits.
@@ -108,15 +119,16 @@ sub VERSION_MESSAGE { pod2usage(1); }
 
 my %opts = (
     'c' => undef,                            # STDIN
-    'd' => strftime("%Y-%m-%d",localtime()), # Date
+    'd' => undef,                            # Date
     'f' => "$ENV{HOME}/.idonethisrc",        # Config
     'h' => undef,                            # Help
     'l' => undef,                            # List
+    'r' => undef,                            # Range
     'V' => undef,                            # Version
     'y' => undef,                            # Yesterday
 );
 
-getopts('cd:f:hlVy', \%opts);
+getopts('cd:f:hlr:Vy', \%opts);
 
 if ($opts{h}) {
     pod2usage(1);
@@ -138,17 +150,40 @@ my $idt = WebService::Idonethis->new(
     pass => $config->{auth}{pass},
 );
 
-my $date = $opts{d};
+# Range processing
 
-# If our date looks screwy, then try to parse it with Date::Manip
+if ($opts{r}) {
 
-if ($date !~ /^\d{4}-\d{2}-\d{2}$/) {
-    my $dmd = Date::Manip::Date->new;
-    if ($dmd->parse($date)) {
-        die "Can't parse date '$date' - " . $dmd->err . "\n";
+    if ( $opts{d} or $opts{y} or $opts{c} ) {
+        die "-r cannot be used with either -d, -y or -c\n";
     }
-    $date = $dmd->printf("%Y-%m-%d");
+
+    if (@ARGV) {
+        die "Items cannot be added to idone with C<-r>\n";
+    }
+
+    my ($from, $to) = split(/\s*,\s*/, $opts{r});
+
+    unless ($from and $to) {
+        die "Ranges for -r must be in the form 'start, end'\n";
+    }
+
+    $from = parse_date($from);
+    $to   = parse_date($to);
+
+    my $dones = $idt->get_range($from, $to);
+
+    # Results seem to come back in reverse chronological order,
+    # so we reverse them here.
+
+    foreach my $item (reverse @$dones) {
+        say "[$item->{done_date}] $item->{text}";
+    }
+    
+    exit 0;
 }
+
+my $date = parse_date( $opts{d} || strftime("%Y-%m-%d",localtime()) );
 
 # Handle yesterday if '-y' switch is turned on.
 if ($opts{y}) {
@@ -160,6 +195,7 @@ if ($opts{y}) {
 if (@ARGV) {
     $idt->set_done( text => "@ARGV", date => $date );
 }
+
 elsif (not $opts{l}) {
     # No arguments, and no -l implies -c
     $opts{c} = 1;
@@ -185,4 +221,18 @@ if ($opts{c}) {
         chomp;
         $idt->set_done( text => $_, date => $date );
     }
+}
+
+sub parse_date {
+    my ($date) = @_;
+
+    if ($date !~ /^\d{4}-\d{2}-\d{2}$/) {
+        my $dmd = Date::Manip::Date->new;
+        if ($dmd->parse($date)) {
+            die "Can't parse date '$date' - " . $dmd->err . "\n";
+        }
+        $date = $dmd->printf("%Y-%m-%d");
+    }
+
+    return $date;
 }
