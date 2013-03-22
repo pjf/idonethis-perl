@@ -78,6 +78,10 @@ Displays this help.
 List items that you've done.  Combine this with the C<-c> switch
 to list done items, and let you add new ones to the end.
 
+=item B<-V>
+
+Shows the current version and exits.
+
 =item B<-y>
 
 Perform all operations (adding and listing) using yesterday's date.
@@ -106,13 +110,19 @@ my %opts = (
     'f' => "$ENV{HOME}/.idonethisrc",        # Config
     'h' => undef,                            # Help
     'l' => undef,                            # List
+    'V' => undef,                            # Version
     'y' => undef,                            # Yesterday
 );
 
-getopts('cd:f:hly', \%opts);
+getopts('cd:f:hlVy', \%opts);
 
 if ($opts{h}) {
     pod2usage(1);
+}
+
+if ($opts{V}) {
+    say "idone version " , WebService::Idonethis->VERSION;
+    exit 1;
 }
 
 my $config = Config::Tiny->read( $opts{f} );
