@@ -29,7 +29,7 @@ one was doing a year ago by email.
 The C<-f> switch can be used to specify a location for the configuration
 file (by default F<~/.idonethisrc>).
 
-Patches are extremely welcome.  L<https://github.com/pfenwick/idonethis-perl>
+Patches are extremely welcome.  L<https://github.com/pjf/idonethis-perl>
 
 =cut
 

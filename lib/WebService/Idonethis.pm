@@ -62,7 +62,7 @@ for running as a cron job.
 The L<idone> command included with this distribution allows you to submit
 new done items from the command line.
 
-Patches are extremely welcome. L<https://github.com/pfenwick/idonethis-perl>
+Patches are extremely welcome. L<https://github.com/pjf/idonethis-perl>
 
 =head1 FILES
 
@@ -223,7 +223,7 @@ sub get_day {
 
     my $dones = $idt->get_today;
 
-This is a convenience method that calls L<get_day> using the current
+This is a convenience method that calls L</get_day> using the current
 (localtime) date as an argument.
 
 =cut
@@ -300,10 +300,10 @@ __PACKAGE__->meta->make_immutable;
 =head1 BUGS
 
 If a suitable cache location cannot be created on the filesystem, this class dies with
-an error. See L<https://github.com/pfenwick/idonethis-perl/issues/7> for more details.
+an error. See L<https://github.com/pjf/idonethis-perl/issues/7> for more details.
 
 Other bugs may be present that are not listed in this documentation. See
-L<https://github.com/pfenwick/idonethis-perl/issues> for a full list, or to submit your
+L<https://github.com/pjf/idonethis-perl/issues> for a full list, or to submit your
 own.
 
 =head1 SEE ALSO

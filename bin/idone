@@ -46,7 +46,7 @@ arguments are concatenated together to form a single string, which
 is then submitted to your calendar for the current day (using the
 local timezone on your machine).
 
-Patches are extremely welcome.  L<https://github.com/pfenwick/idonethis-perl>
+Patches are extremely welcome.  L<https://github.com/pjf/idonethis-perl>
 
 =head1 OPTIONS
 
