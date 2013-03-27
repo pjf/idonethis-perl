@@ -90,6 +90,10 @@ List items in a I<range> of dates, in the form C<-r '2013-01-01, 2013-01-31'>.
 Natural dates may also be used, as in C<-r '1 week ago, today'>.  This switch
 is exclusive of the C<-d>, C<-y> and C<-c> switches.
 
+With only a single argument, a second argument of 'now' is implied. This
+allows shortcuts like C<idone -r'last week'> to show everything done
+since last week.
+
 This switch implies C<-l>.
 
 =item B<-V>
@@ -152,6 +156,9 @@ my $idt = WebService::Idonethis->new(
 
 # Range processing
 
+# BUG: If '-r' is provided with no argument, this doesn't seem
+# to trigger. So don't do that.
+
 if ($opts{r}) {
 
     if ( $opts{d} or $opts{y} or $opts{c} ) {
@@ -164,8 +171,10 @@ if ($opts{r}) {
 
     my ($from, $to) = split(/\s*,\s*/, $opts{r});
 
-    unless ($from and $to) {
-        die "Ranges for -r must be in the form 'start, end'\n";
+    $to ||= 'now';
+
+    unless ($from) {
+        die "At least a start date is required for -r\n";
     }
 
     $from = parse_date($from);
