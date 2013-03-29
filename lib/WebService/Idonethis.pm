@@ -156,6 +156,7 @@ sub BUILD {
         # We used to save the cookie jar on destruction, but that
         # caused a hiccup with Moo. Now we save immediately after
         # login.
+
         $self->agent->cookie_jar->save();
     };
 
