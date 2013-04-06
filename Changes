@@ -2,6 +2,9 @@ Revision history for WebService::Idonethis
 
 {{$NEXT}}
 
+    * OPTIMISE: Keep-alive is set on connections to idonethis
+                for faster network operations.
+
 0.18      2013-03-27 15:21:19 Australia/Melbourne
 
     * FEATURE:  -r with only a single date implies an end of 'now' (GH #13)
