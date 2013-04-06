@@ -118,6 +118,7 @@ sub BUILD {
         $agent = WWW::Mechanize->new(
             agent      => "perl/$], WebService::Idonethis/" . $self->VERSION,
             cookie_jar => HTTP::Cookies->new( file => File::Spec->catfile( $user_cache , "cookies") ),
+            keep_alive => 1,
         );
 
         $self->agent( $agent );
