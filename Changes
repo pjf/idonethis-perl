@@ -2,6 +2,10 @@ Revision history for WebService::Idonethis
 
 {{$NEXT}}
 
+    * BUGFIX: Handle detection of personal calendar page when presented
+              with a /home screen. Fixes a 'unexpected URL' error on
+              login. (Spotted by @wizonesolutions)
+
 0.19      2013-04-06 16:58:35 Australia/Melbourne
 
     * OPTIMISE: Keep-alive is set on connections to idonethis

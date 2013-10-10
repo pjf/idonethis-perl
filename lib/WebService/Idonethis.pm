@@ -89,7 +89,7 @@ sub BUILD {
 
         # XDG is used to figure out where to store cache and config
         # files. If not provided at initialisation time, we'll
-        # mae our own.
+        # make our own.
 
         $self->xdg(File::XDG->new(name => 'webservice-idonethis-perl'));
     }
@@ -127,8 +127,6 @@ sub BUILD {
 
     # Ping idonethis to see if we even need to login.
 
-    # We're going to guess our user URL so we can do a get_day.
-
     try {
         $self->get_today;   # Throws on failure
     }
@@ -147,12 +145,35 @@ sub BUILD {
 
         my $url = $agent->uri;
 
-        if ($url !~ m{/cal/$args->{user}/?$}i) {
+        if ($url =~ m{/login/?$}i) {
+            # Bounced back to login screen. Login failed
+            croak "Login to idonethis failed (wrong username/password?)";
+        }
+        elsif ($url =~ m{/home/?$}i) {
+            # Taken to home-screen. Login successful, but we need to
+            # chase our calendar link.
+
+            $agent->follow_link( text_regex => qr{\w+ personal} );
+        }
+        elsif ($url !~ m{/cal/\w+/?$}) {
+            # Oh noes! Where are we?
             croak "Login to idonethis failed (unexpected URL $url)";
         }
 
-        $self->user_url( $url );
-        $self->user( $args->{user} );
+        # At this point, we *should* be on our calendar page.
+        $url = $agent->uri;
+
+        if ($url =~ m{/cal/(?<user>\w+)/?$}) {
+
+            # Looks like a valid calendar! Remember our calendar
+            # URL and username.
+
+            $self->user_url( $url );
+            $self->user( $+{user} );
+        }
+        else {
+            croak "Failed to navigate to idonethis calendar (found self at $url)";
+        }
 
         # We used to save the cookie jar on destruction, but that
         # caused a hiccup with Moo. Now we save immediately after
