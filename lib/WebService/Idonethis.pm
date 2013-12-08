@@ -119,6 +119,7 @@ sub BUILD {
             agent      => "perl/$], WebService::Idonethis/" . $self->VERSION,
             cookie_jar => HTTP::Cookies->new( file => File::Spec->catfile( $user_cache , "cookies") ),
             keep_alive => 1,
+            stack_depth => 0, # Don't keep history
         );
 
         $self->agent( $agent );
@@ -153,7 +154,7 @@ sub BUILD {
             # Taken to home-screen. Login successful, but we need to
             # chase our calendar link.
 
-            $agent->follow_link( text_regex => qr{\w+ personal} );
+            $agent->follow_link( text_regex => qr{\bpersonal\b} );
         }
         elsif ($url !~ m{/cal/\w+/?$}) {
             # Oh noes! Where are we?

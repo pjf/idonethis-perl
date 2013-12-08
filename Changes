@@ -2,6 +2,9 @@ Revision history for WebService::Idonethis
 
 {{$NEXT}}
 
+    * BUGFIX: Fix 'link not found' exception on login.
+    * BUGFIX: Fix potential memory leak on long running processes.
+
 0.20      2013-10-11 10:46:32 Australia/Melbourne
 
     * BUGFIX: Handle detection of personal calendar page when presented
