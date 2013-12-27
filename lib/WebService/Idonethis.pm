@@ -159,14 +159,18 @@ sub BUILD {
 
             my $cal = $self->calendar;
 
-            # First try a link with the calendar name at the end.
-            # Failing that, try the calendar in the name
-            # Failing that, try personal.
+            {
+                # Disable autochecks for now.
+                local $agent->{autocheck} = 0;
 
-            $agent->follow_link(        url_regex  => qr{/$cal/?\#?} )
-                // $agent->follow_link( text_regex => qr{\b$cal\b}   ) 
-                // $agent->follow_link( text       => 'personal'     )
-            ;
+                # First try a link with the calendar name at the end.
+                # Failing that, try the calendar in the name
+                # Failing that, try personal.
+
+                $agent->follow_link( url_regex  => qr{/$cal/?\#?} ) //
+                $agent->follow_link( text_regex => qr{\b$cal\b}   ) //
+                $agent->follow_link( text       => 'personal'     ) ;
+            }
         }
         elsif ($url !~ m{/cal/\w+/?\#?$}) {
             # Oh noes! Where are we?
@@ -175,6 +179,8 @@ sub BUILD {
 
         # At this point, we *should* be on our calendar page.
         $url = $agent->uri;
+
+        $url =~ s/\#?$//;   # Remove trailing hash, if present
 
         if ($url =~ m{/cal/(?<cal>[\w-]+)/?$}) {
 

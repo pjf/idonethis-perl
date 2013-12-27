@@ -5,6 +5,9 @@ Revision history for WebService::Idonethis
     * FEATURE: Allow optional calendar field in ~/.idonethisrc
                (Courtesy @norbu09, GH #15)
 
+    * FEATURE: Logins with email addresses (as well as user-names)
+               are now handled. (GH #11)
+
     * BUGFIX: More robust handling of finding calnedar links.
               We now fall-back to the 'personal' calendar if no
               other links are found.
