@@ -41,6 +41,7 @@ use utf8::all;
     [auth]
     user=someuser
     pass=somepass
+    calendar=some calendar name
 
 =head1 DESCRIPTION
 
@@ -109,6 +110,7 @@ This switch overrides the C<-d> switch, if given.
 
 =cut
 
+use lib 'lib';
 use Getopt::Std;
 use Pod::Usage;
 use WebService::Idonethis;
@@ -150,8 +152,9 @@ unless ($config->{auth}{user}) {
 }
 
 my $idt = WebService::Idonethis->new(
-    user => $config->{auth}{user},
-    pass => $config->{auth}{pass},
+    user     => $config->{auth}{user},
+    pass     => $config->{auth}{pass},
+    calendar => $config->{auth}{calendar}
 );
 
 # Range processing

@@ -71,11 +71,12 @@ Sessions are cached in your XDG cache directory as
 
 =for Pod::Coverage BUILD DEMOLISH
 
-=for Pod::Coverage agent user_url user xdg
+=for Pod::Coverage agent calendar user_url user xdg
 
 =cut
 
 has agent    => (               is => 'rw' );
+has calendar => (               is => 'rw' );
 has user_url => (               is => 'rw' );
 has user     => (               is => 'rw' );
 has xdg      => (               is => 'rw' );
@@ -95,8 +96,9 @@ sub BUILD {
     }
 
     # Theoretically these may get changed after login.
+    $self->calendar( $args->{calendar} ? $args->{calendar} : $args->{user} );
     $self->user    ( $args->{user} );
-    $self->user_url( "https://idonethis.com/cal/$args->{user}/" );
+    $self->user_url( "https://idonethis.com/cal/$self->calendar/" );
 
     if (not $agent) {
 
@@ -154,7 +156,8 @@ sub BUILD {
             # Taken to home-screen. Login successful, but we need to
             # chase our calendar link.
 
-            $agent->follow_link( text_regex => qr{\bpersonal\b} );
+            my $cal = $args->{calendar};
+            $agent->follow_link( text_regex => qr{\b$cal\b} );
         }
         elsif ($url !~ m{/cal/\w+/?$}) {
             # Oh noes! Where are we?
@@ -164,13 +167,13 @@ sub BUILD {
         # At this point, we *should* be on our calendar page.
         $url = $agent->uri;
 
-        if ($url =~ m{/cal/(?<user>\w+)/?$}) {
+        if ($url =~ m{/cal/(?<cal>[\w-]+)/?$}) {
 
             # Looks like a valid calendar! Remember our calendar
             # URL and username.
 
             $self->user_url( $url );
-            $self->user( $+{user} );
+            $self->calendar( $+{cal} );
         }
         else {
             croak "Failed to navigate to idonethis calendar (found self at $url)";
