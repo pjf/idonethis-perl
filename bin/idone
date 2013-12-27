@@ -50,6 +50,11 @@ arguments are concatenated together to form a single string, which
 is then submitted to your calendar for the current day (using the
 local timezone on your machine).
 
+The C<calendar> name is optional, and if present will be searched
+for in first the URL, then as a text link. If not found, your username
+will be used, and if all else fails, idone will default to your
+personal calendar.
+
 Patches are extremely welcome.  L<https://github.com/pjf/idonethis-perl>
 
 =head1 OPTIONS
@@ -110,7 +115,6 @@ This switch overrides the C<-d> switch, if given.
 
 =cut
 
-use lib 'lib';
 use Getopt::Std;
 use Pod::Usage;
 use WebService::Idonethis;

@@ -148,18 +148,27 @@ sub BUILD {
 
         my $url = $agent->uri;
 
-        if ($url =~ m{/login/?$}i) {
+        if ($url =~ m{/login/?\#?$}i) {
             # Bounced back to login screen. Login failed
             croak "Login to idonethis failed (wrong username/password?)";
         }
-        elsif ($url =~ m{/home/?$}i) {
+        elsif ($url =~ m{/home/?\#?$}i) {
+
             # Taken to home-screen. Login successful, but we need to
             # chase our calendar link.
 
-            my $cal = $args->{calendar};
-            $agent->follow_link( text_regex => qr{\b$cal\b} );
+            my $cal = $self->calendar;
+
+            # First try a link with the calendar name at the end.
+            # Failing that, try the calendar in the name
+            # Failing that, try personal.
+
+            $agent->follow_link(        url_regex  => qr{/$cal/?\#?} )
+                // $agent->follow_link( text_regex => qr{\b$cal\b}   ) 
+                // $agent->follow_link( text       => 'personal'     )
+            ;
         }
-        elsif ($url !~ m{/cal/\w+/?$}) {
+        elsif ($url !~ m{/cal/\w+/?\#?$}) {
             # Oh noes! Where are we?
             croak "Login to idonethis failed (unexpected URL $url)";
         }
@@ -176,7 +185,7 @@ sub BUILD {
             $self->calendar( $+{cal} );
         }
         else {
-            croak "Failed to navigate to idonethis calendar (found self at $url)";
+            croak "Failed to navigate to idonethis calendar (" . $self->calendar. ") (found self at $url)";
         }
 
         # We used to save the cookie jar on destruction, but that
