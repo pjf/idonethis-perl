@@ -214,7 +214,7 @@ conversation from the JSON data structure used by idonethis. The
 structure at the time of writing looks like this:
 
 The 'text' field (and currently only the 'text' field) will have
-HTML entities converted before it is returned. (eg, '&gt' -> '>')
+HTML entities converted before it is returned (eg, '&gt;' becomes '>').
 
     [
         {
@@ -262,7 +262,7 @@ sub get_today {
 
 =method get_range
 
-    my $done = $idt->get_range('2012-01-01', 2012-01-31');
+    my $done = $idt->get_range('2012-01-01', '2012-01-31');
 
 Gets everything done in a range of dates. Returns in the same
 format at L</get_day> above.
