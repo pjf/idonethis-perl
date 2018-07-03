@@ -46,7 +46,7 @@ my $json = JSON::Any->new;
 
 =head1 DESCRIPTION
 
-This is an extremely bare-bones wrapper around the L<idonethis.com>
+This is an extremely bare-bones wrapper around the L<idonethis.com|https://idonethis.com>
 website that allows retrieving of what was done on a particular day.
 It's only been tested with personal calendars. Patches are extremely
 welcome.
