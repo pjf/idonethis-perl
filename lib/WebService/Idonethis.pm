@@ -108,7 +108,7 @@ sub BUILD {
         my $xdg = $self->xdg;
 
         if (not -e $xdg->cache_home) {
-            mkdir($xdg->cache_home);
+            mkdir(File::XDG::_home('cache'));
         }
 
         my $user_cache = File::Spec->catfile( $xdg->cache_home, $self->user );
